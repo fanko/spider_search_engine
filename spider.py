@@ -51,12 +51,13 @@ def get_soup(query, page):
 
     # 将url写入request对象，并伪造user-agent避免被百度封
     request = urllib2.Request(url)
-    index = random.randint(0, len(user_agent_list))
+    index = random.randint(0, len(user_agent_list)-1)
     user_agent = user_agent_list[index]
     request.add_header('User-agent', user_agent)
 
     # 抓取url
     html=urllib2.urlopen(request).read()
+    time.sleep(0.5)
 
     # 将返回的html对象利用BeautifulSoup对象解析
     soup=BeautifulSoup(html)
@@ -86,19 +87,48 @@ def search(query):
 
         # 通过BeautifulSoup的find_all函数以及百度的xml页面结构解析出url,title和abstract
         for item in soup.find_all("div", "result c-container "):
+            # 解析出abstract
             abstract =  item.div.get_text().encode("utf-8")
+
+            # 解析出title
             regex = u"data-tools='\{\"title\":\"(.*)\",\"url\":\"(.*)\"\}'"
-            content = item.find_all("div", "c-tools")
-            link = re.findall(regex, str(content[0]))
+            div = item.find_all("div", "c-tools")
+            link = re.findall(regex, str(div[0]))
             title = link[0][0]
-            url = link[0][1]
-            query_result.append([url, title, abstract])
+
+            # 解析出url片段和最后更新日期
+            span = item.find_all("span", "g")
+            content = span[0].get_text()
+            lst = content.strip().split()
+            url = ""
+            day = ""
+            if len(lst) == 2:
+                url = lst[0].strip().encode("utf-8")
+                day = lst[1].strip().encode("utf-8")
+
+            # 更新query_result
+            query_result.append([url, title, abstract, day])
 
     return query_result
 
 if __name__=='__main__':
+    fout = open("debug.log", "a")
     for line in sys.stdin:
         key = line.strip()
-        search_result = search(key)
+        search_result = []
+        repeat_number = 10
+        while repeat_number > 0:
+            begin = time.time()
+            try:
+                search_result = search(key)
+                end = time.time()
+                fout.write("%s\tis  OK\t%4.3f\n" %(key, end-begin))
+            except:
+                repeat_number -= 1
+                end = time.time()
+                fout.write("%s\trepeat\t%4.3f\n" %(key, end-begin))
+            if search_result:
+                break
+
         for i in range(len(search_result)):
             print "\001".join([key, str(i+1)]+search_result[i])
