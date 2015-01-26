@@ -1,4 +1,5 @@
 # encoding: utf-8
+# author: fanko24@gmail.com
 
 import sys
 import time
@@ -112,7 +113,7 @@ def search(query):
     return query_result
 
 if __name__=='__main__':
-    fout = open("debug.log", "a")
+    fout = open("email.debug.log", "a")
     for line in sys.stdin:
         key = line.strip()
         search_result = []
