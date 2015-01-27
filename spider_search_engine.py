@@ -131,5 +131,8 @@ if __name__=='__main__':
             if search_result:
                 break
 
-        for i in range(len(search_result)):
-            print "\001".join([key, str(i+1)]+search_result[i])
+        if len(search_result) == 0:
+            print "\001".join([key, 1])
+        else:
+            for i in range(len(search_result)):
+                print "\001".join([key, str(i+1)]+search_result[i])
