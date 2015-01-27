@@ -58,7 +58,7 @@ def get_soup(query, page):
 
     # 抓取url
     html=urllib2.urlopen(request).read()
-    time.sleep(0.5)
+    time.sleep(1.5)
 
     # 将返回的html对象利用BeautifulSoup对象解析
     soup=BeautifulSoup(html)
@@ -113,7 +113,6 @@ def search(query):
     return query_result
 
 if __name__=='__main__':
-    fout = open("email.debug.log", "a")
     for line in sys.stdin:
         key = line.strip()
         search_result = []
@@ -123,13 +122,13 @@ if __name__=='__main__':
             try:
                 search_result = search(key)
                 end = time.time()
-                fout.write("%s\tis  OK\t%4.3f\n" %(key, end-begin))
+                print "%s\tis  OK\t%4.3f\n" %(key, end-begin)
             except:
                 repeat_number -= 1
                 end = time.time()
-                fout.write("%s\trepeat\t%4.3f\n" %(key, end-begin))
+                print "%s\trepeat\t%4.3f\n" %(key, end-begin)
             if search_result:
                 break
 
-        for i in range(len(search_result)):
-            print "\001".join([key, str(i+1)]+search_result[i])
+        #for i in range(len(search_result)):
+            #print "\001".join([key, str(i+1)]+search_result[i])
