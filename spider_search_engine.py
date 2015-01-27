@@ -113,6 +113,7 @@ def search(query):
     return query_result
 
 if __name__=='__main__':
+    fout = open("debug.log", "a")
     for line in sys.stdin:
         key = line.strip()
         search_result = []
@@ -122,13 +123,13 @@ if __name__=='__main__':
             try:
                 search_result = search(key)
                 end = time.time()
-                print "%s\tis  OK\t%4.3f\n" %(key, end-begin)
+                fout.write("%s\tis  OK\t%4.3f\n" %(key, end-begin))
             except:
                 repeat_number -= 1
                 end = time.time()
-                print "%s\trepeat\t%4.3f\n" %(key, end-begin)
+                fout.write("%s\trepeat\t%4.3f\n" %(key, end-begin))
             if search_result:
                 break
 
-        #for i in range(len(search_result)):
-            #print "\001".join([key, str(i+1)]+search_result[i])
+        for i in range(len(search_result)):
+            print "\001".join([key, str(i+1)]+search_result[i])
